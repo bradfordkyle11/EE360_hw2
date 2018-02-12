@@ -1,10 +1,10 @@
-public class testThreadSynch implements Runnable {
+public class testMonitorThreadSynch implements Runnable {
   final static int SIZE = 5;
   final static int ROUND = 5;
 
-  final ThreadSynch gate;
+  final MonitorThreadSynch gate;
 
-  public testThreadSynch(ThreadSynch gate) {
+  public testMonitorThreadSynch(MonitorThreadSynch gate) {
     this.gate = gate;
   }
 
@@ -23,11 +23,11 @@ public class testThreadSynch implements Runnable {
   }
 
   public static void main(String[] args) {
-    ThreadSynch gate = new ThreadSynch(SIZE);
+    MonitorThreadSynch gate = new MonitorThreadSynch(SIZE);
     Thread[] t = new Thread[SIZE];
 
     for (int i = 0; i < SIZE; ++i) {
-      t[i] = new Thread(new testThreadSynch(gate));
+      t[i] = new Thread(new testMonitorThreadSynch(gate));
     }
 
     for (int i = 0; i < SIZE; ++i) {

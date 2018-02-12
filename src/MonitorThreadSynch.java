@@ -1,17 +1,33 @@
 /*
- * EID's of group members
- * 
- */
+* EID's of group members
+*
+*/
 
 public class MonitorThreadSynch {
-	
-	public MonitorThreadSynch(int parties) {
-	}
-	
-	public int await() throws InterruptedException {
-           int index = 0;
-		
-          // you need to write this code
-	    return index;
-	}
+  int active, N, round;
+
+  public MonitorThreadSynch(int parties) {
+    this.active = this.N = parties;
+    round = 0;
+  }
+
+  public int await() throws InterruptedException {
+    int index;
+    synchronized (this) {
+      index = --active;
+      int my_round = round;
+
+      if (index != 0)
+        while (active < N && round == my_round)
+          wait ();
+      else
+      {
+        active = N;
+        round++;
+        notifyAll ();
+      }
+    }
+
+    return index;
+  }
 }
