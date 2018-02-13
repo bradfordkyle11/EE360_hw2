@@ -1,9 +1,10 @@
 import java.util.*;
 import java.util.concurrent.locks.*;
 
+@SuppressWarnings("unchecked")
 public class PriorityQueue {
-  private LinkedList<String> q[] = (LinkedList<String>[]) new LinkedList[10];
-  private LinkedList<ReentrantLock> q_lock[] = (LinkedList<ReentrantLock>[]) new LinkedList[10];
+  private LinkedList<String> q[] = new LinkedList[10];
+  private ReentrantLock q_lock[] = new ReentrantLock[10];
   private ReentrantLock length_mutex = new ReentrantLock ();
   private Condition full = length_mutex.newCondition ();
   private Condition empty = length_mutex.newCondition ();
@@ -12,15 +13,15 @@ public class PriorityQueue {
 
   public PriorityQueue (int maxSize) {
     // Creates a Priority queue with maximum allowed size as capacity
-    for (int i=0; i<10; i++)
-    {
-      q[i] = new LinkedList<String> ();
-      q_lock[i] = new LinkedList<ReentrantLock> ();
-    }
-    /*for (LinkedList<String> each : q)
-      each = new LinkedList<String> ();
-    for (LinkedList<ReentrantLock> each : q_lock)
-      each = new LinkedList<ReentrantLock> ();*/
+    // for (int i=0; i<10; i++)
+    // {
+    //   q[i] = new LinkedList<String> ();
+    //   q_lock[i] = new ReentrantLock ();
+    // }
+    // for (LinkedList<String> each : q)
+    //   each = new LinkedList<String> ();
+    // for (ReentrantLock each : q_lock)
+    //   each = new ReentrantLock ();
     this.maxSize = maxSize;
   }
 
@@ -104,7 +105,7 @@ public class PriorityQueue {
     }
 
     String result = null;
-    for (int i=9; i>priority; i--)
+    for (int i=9; i>-1; i--)
     {
       q_lock[i].lock ();
       result = q[i].pollFirst ();
