@@ -8,6 +8,8 @@ public class PriorityQueue {
   private ReentrantLock length_mutex = new ReentrantLock ();
   private Condition full = length_mutex.newCondition ();
   private Condition empty = length_mutex.newCondition ();
+  private ArrayDeque<String> name_q = new ArrayDeque<String> ();
+  private ReentrantLock name_q_mutex = new ReentrantLock ();
   private int length = 0;
   private int maxSize;
 
@@ -40,20 +42,41 @@ public class PriorityQueue {
       length_mutex.unlock ();
     }
 
-    q_lock[priority].lock ();
     int result = -1;
-    if (search (name) == -1)
+    name_q_mutex.lock ();
+    if (!name_q.contains (name))
     {
-      q[priority].add (name);
-      result = search (name);
-      q_lock[priority].unlock ();
+      name_q.add (name);
+      name_q_mutex.unlock ();
 
-      length_mutex.lock ();
-      empty.signal ();
-      length_mutex.unlock ();
+      if (search (name) == -1)
+      {
+        q_lock[priority].lock ();
+        q[priority].add (name);
+        q_lock[priority].unlock ();
+
+        name_q_mutex.lock ();
+        name_q.remove (name);
+        name_q_mutex.unlock ();
+
+        // System.out.println ("(" + name + ", " + priority + ") before...");
+        result = search (name);
+        // System.out.println ("(" + name + ", " + priority + ") after...");
+
+        length_mutex.lock ();
+        empty.signal ();
+        length_mutex.unlock ();
+      }
     }
     else
-      q_lock[priority].unlock ();
+      name_q_mutex.unlock ();
+
+    if (result == -1)
+    {
+      length_mutex.lock ();
+      length--;
+      length_mutex.unlock ();
+    }
 
     return result;
   }
@@ -108,6 +131,7 @@ public class PriorityQueue {
         break;
     }
     assert (result != null);
+
     length_mutex.lock ();
     full.signal ();
     length_mutex.unlock ();
