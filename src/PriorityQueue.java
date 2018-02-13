@@ -45,22 +45,15 @@ public class PriorityQueue {
     if (search (name) == -1)
     {
       q[priority].add (name);
-      result = q[priority].size () - 1;
-    }
-    q_lock[priority].unlock ();
+      result = search (name);
+      q_lock[priority].unlock ();
 
-    if (result != -1)
-    {
-      for (int i=9; i>priority; i--)
-      {
-        q_lock[i].lock ();
-        result += q[i].size ();
-        q_lock[i].unlock ();
-      }
       length_mutex.lock ();
       empty.signal ();
       length_mutex.unlock ();
     }
+    else
+      q_lock[priority].unlock ();
 
     return result;
   }
@@ -81,6 +74,9 @@ public class PriorityQueue {
       if (result != -1)
         break;
     }
+
+    if (result == -1)
+      return result;
 
     return result + offset;
   }
