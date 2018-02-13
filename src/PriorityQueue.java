@@ -33,7 +33,7 @@ public class PriorityQueue {
     {
       while (length >= maxSize)
       {
-        System.out.println ("FUUUUUUUUUUUUUUUUUULLLLLLLLLLLLLLLLLLLLLLLLLLL");
+        // System.out.println ("FUUUUUUUUUUUUUUUUUULLLLLLLLLLLLLLLLLLLLLLLLLLL");
         full.await ();
       }
     }
@@ -48,16 +48,16 @@ public class PriorityQueue {
     nameQMutex.lock ();
     if (!nameQ.contains (name))
     {
-      System.out.println ("branch 0");
+      // System.out.println ("branch 0");
       nameQ.add (name);
       nameQMutex.unlock ();
 
       if (search (name) == -1)
       {
-        System.out.println ("branch 1a");
+        // System.out.println ("branch 1a");
         qLock[priority].lock ();
         q[priority].add (name);
-        print ();
+        // print ();
         qLock[priority].unlock ();
 
         // System.out.println ("(" + name + ", " + priority + ") before...");
@@ -69,15 +69,15 @@ public class PriorityQueue {
         empty.signal ();
         lengthMutex.unlock ();
       }
-      else
-        System.out.println ("branch 1b");
+      // else
+        // System.out.println ("branch 1b");
       nameQMutex.lock ();
       nameQ.remove (name);
       nameQMutex.unlock ();
     }
     else
     {
-      System.out.println ("branch 0b");
+      // System.out.println ("branch 0b");
       nameQMutex.unlock ();
     }
 
@@ -137,7 +137,7 @@ public class PriorityQueue {
     }
     if (result == null)
     {
-      System.out.println ("pooop");
+      // System.out.println ("pooop");
       System.exit (1);
     }
 
@@ -151,7 +151,7 @@ public class PriorityQueue {
   public void print ()
   {
     LinkedList<String> all = new LinkedList<String> ();
-    for (int i=0; i>=0; i--)
+    for (int i=9; i>=0; i--)
       all.addAll (q[i]);
     System.out.println (all.toString ());
   }

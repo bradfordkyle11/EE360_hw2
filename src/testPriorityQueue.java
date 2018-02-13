@@ -2,7 +2,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class testPriorityQueue implements Runnable
 {
-  static PriorityQueue q = new PriorityQueue (5);
+  static PriorityQueue q = new PriorityQueue (50);
   static int count = 0;
 
   public testPriorityQueue ()
@@ -20,16 +20,17 @@ public class testPriorityQueue implements Runnable
       int i = ThreadLocalRandom.current().nextInt(0, 100);
       if (i < 66)
       {
-        int which = count % names.length; //ThreadLocalRandom.current().nextInt(0, 6);
+        // int which = count % names.length;
+        int which = ThreadLocalRandom.current().nextInt(0, 6);
         int priority = ThreadLocalRandom.current().nextInt(0, 10);
         int myCount = ++count;
         System.out.println (tid + " q.add ("+ names[which] + ", " + priority + ")              " + myCount);
         int result = q.add (names[which], priority);
         System.out.println (" > q.add ("+ names[which] + ", " + priority + ") => " + result + "    " + myCount);
-        // q.print ();
+        q.print ();
 
         int yes = ThreadLocalRandom.current().nextInt(0, 2);
-        if (yes > 0 && result != -1 && false)
+        if (yes > 0 && result != -1)
         {
           try
           {
@@ -39,7 +40,7 @@ public class testPriorityQueue implements Runnable
           {}
           System.out.println (tid + " q.getFirst ()             " + myCount);
           System.out.println (" > q.getFirst () => " + q.getFirst () + "     " + myCount);
-          // q.print ();
+          q.print ();
         }
       }
       else
@@ -48,7 +49,7 @@ public class testPriorityQueue implements Runnable
         int myCount = ++count;
         System.out.println (tid + " q.search ("+ names[which] + ")              " + myCount);
         System.out.println (" > q.search ("+ names[which] + ") => " + q.search (names[which]) + "    " + myCount);
-        // q.print ();
+        q.print ();
       }
     }
   }
@@ -57,7 +58,7 @@ public class testPriorityQueue implements Runnable
 
   public static void main (String[] args)
   {
-    final int SIZE = 1;
+    final int SIZE = 10;
     Thread[] t = new Thread[SIZE];
 
     for (int i = 0; i < SIZE; ++i) {
