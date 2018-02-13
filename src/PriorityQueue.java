@@ -13,15 +13,11 @@ public class PriorityQueue {
 
   public PriorityQueue (int maxSize) {
     // Creates a Priority queue with maximum allowed size as capacity
-    // for (int i=0; i<10; i++)
-    // {
-    //   q[i] = new LinkedList<String> ();
-    //   q_lock[i] = new ReentrantLock ();
-    // }
-    // for (LinkedList<String> each : q)
-    //   each = new LinkedList<String> ();
-    // for (ReentrantLock each : q_lock)
-    //   each = new ReentrantLock ();
+    for (int i=0; i<10; i++)
+    {
+      q[i] = new LinkedList<String> ();
+      q_lock[i] = new ReentrantLock ();
+    }
     this.maxSize = maxSize;
   }
 
@@ -61,7 +57,9 @@ public class PriorityQueue {
         result += q[i].size ();
         q_lock[i].unlock ();
       }
+      length_mutex.lock ();
       empty.signal ();
+      length_mutex.unlock ();
     }
 
     return result;
@@ -114,7 +112,9 @@ public class PriorityQueue {
         break;
     }
     assert (result != null);
+    length_mutex.lock ();
     full.signal ();
+    length_mutex.unlock ();
 
     return result;
   }
