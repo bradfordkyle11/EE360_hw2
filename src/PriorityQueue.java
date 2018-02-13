@@ -4,12 +4,12 @@ import java.util.concurrent.locks.*;
 @SuppressWarnings("unchecked")
 public class PriorityQueue {
   private LinkedList<String> q[] = new LinkedList[10];
-  private ReentrantLock q_lock[] = new ReentrantLock[10];
-  private ReentrantLock length_mutex = new ReentrantLock ();
-  private Condition full = length_mutex.newCondition ();
-  private Condition empty = length_mutex.newCondition ();
-  private ArrayDeque<String> name_q = new ArrayDeque<String> ();
-  private ReentrantLock name_q_mutex = new ReentrantLock ();
+  private ReentrantLock qLock[] = new ReentrantLock[10];
+  private ReentrantLock lengthMutex = new ReentrantLock ();
+  private Condition full = lengthMutex.newCondition ();
+  private Condition empty = lengthMutex.newCondition ();
+  private ArrayDeque<String> nameQ = new ArrayDeque<String> ();
+  private ReentrantLock nameQMutex = new ReentrantLock ();
   private int length = 0;
   private int maxSize;
 
@@ -18,7 +18,7 @@ public class PriorityQueue {
     for (int i=0; i<10; i++)
     {
       q[i] = new LinkedList<String> ();
-      q_lock[i] = new ReentrantLock ();
+      qLock[i] = new ReentrantLock ();
     }
     this.maxSize = maxSize;
   }
@@ -28,7 +28,7 @@ public class PriorityQueue {
     // Returns the current position in the list where the name was inserted;
     // otherwise, returns -1 if the name is already present in the list.
     // This method blocks when the list is full.
-    length_mutex.lock ();
+    lengthMutex.lock ();
     try
     {
       while (length >= maxSize)
@@ -39,43 +39,43 @@ public class PriorityQueue {
     {}
     finally
     {
-      length_mutex.unlock ();
+      lengthMutex.unlock ();
     }
 
     int result = -1;
-    name_q_mutex.lock ();
-    if (!name_q.contains (name))
+    nameQMutex.lock ();
+    if (!nameQ.contains (name))
     {
-      name_q.add (name);
-      name_q_mutex.unlock ();
+      nameQ.add (name);
+      nameQMutex.unlock ();
 
       if (search (name) == -1)
       {
-        q_lock[priority].lock ();
+        qLock[priority].lock ();
         q[priority].add (name);
-        q_lock[priority].unlock ();
+        qLock[priority].unlock ();
 
-        name_q_mutex.lock ();
-        name_q.remove (name);
-        name_q_mutex.unlock ();
+        nameQMutex.lock ();
+        nameQ.remove (name);
+        nameQMutex.unlock ();
 
         // System.out.println ("(" + name + ", " + priority + ") before...");
         result = search (name);
         // System.out.println ("(" + name + ", " + priority + ") after...");
 
-        length_mutex.lock ();
+        lengthMutex.lock ();
         empty.signal ();
-        length_mutex.unlock ();
+        lengthMutex.unlock ();
       }
     }
     else
-      name_q_mutex.unlock ();
+      nameQMutex.unlock ();
 
     if (result == -1)
     {
-      length_mutex.lock ();
+      lengthMutex.lock ();
       length--;
-      length_mutex.unlock ();
+      lengthMutex.unlock ();
     }
 
     return result;
@@ -89,11 +89,11 @@ public class PriorityQueue {
 
     for (int i=9; i>-1; i--)
     {
-      q_lock[i].lock ();
+      qLock[i].lock ();
       result = q[i].indexOf (name);
       if (result == -1)
         offset += q[i].size ();
-      q_lock[i].unlock ();
+      qLock[i].unlock ();
       if (result != -1)
         break;
     }
@@ -107,7 +107,7 @@ public class PriorityQueue {
   public String getFirst () {
     // Retrieves and removes the name with the highest priority in the list,
     // or blocks the thread if the list is empty.
-    length_mutex.lock ();
+    lengthMutex.lock ();
     try
     {
       while (length == 0)
@@ -118,23 +118,23 @@ public class PriorityQueue {
     {}
     finally
     {
-      length_mutex.unlock ();
+      lengthMutex.unlock ();
     }
 
     String result = null;
     for (int i=9; i>-1; i--)
     {
-      q_lock[i].lock ();
+      qLock[i].lock ();
       result = q[i].pollFirst ();
-      q_lock[i].unlock ();
+      qLock[i].unlock ();
       if (result != null)
         break;
     }
     assert (result != null);
 
-    length_mutex.lock ();
+    lengthMutex.lock ();
     full.signal ();
-    length_mutex.unlock ();
+    lengthMutex.unlock ();
 
     return result;
   }
