@@ -33,7 +33,6 @@ public class PriorityQueue {
     {
       while (length >= maxSize)
         full.await ();
-      length++;
     }
     catch (Exception e)
     {}
@@ -55,28 +54,22 @@ public class PriorityQueue {
         q[priority].add (name);
         qLock[priority].unlock ();
 
-        nameQMutex.lock ();
-        nameQ.remove (name);
-        nameQMutex.unlock ();
-
         // System.out.println ("(" + name + ", " + priority + ") before...");
         result = search (name);
         // System.out.println ("(" + name + ", " + priority + ") after...");
 
         lengthMutex.lock ();
+        length++;
         empty.signal ();
         lengthMutex.unlock ();
       }
+
+      nameQMutex.lock ();
+      nameQ.remove (name);
+      nameQMutex.unlock ();
     }
     else
       nameQMutex.unlock ();
-
-    if (result == -1)
-    {
-      lengthMutex.lock ();
-      length--;
-      lengthMutex.unlock ();
-    }
 
     return result;
   }
@@ -112,7 +105,6 @@ public class PriorityQueue {
     {
       while (length == 0)
         empty.await ();
-      length--;
     }
     catch (Exception e)
     {}
@@ -128,15 +120,30 @@ public class PriorityQueue {
       result = q[i].pollFirst ();
       qLock[i].unlock ();
       if (result != null)
+      {
+        length--;
         break;
+      }
     }
-    assert (result != null);
+    if (result == null)
+    {
+      System.out.println ("pooop");
+      System.exit (1);
+    }
 
     lengthMutex.lock ();
     full.signal ();
     lengthMutex.unlock ();
 
     return result;
+  }
+
+  public void print ()
+  {
+    LinkedList<String> all = new LinkedList<String> ();
+    for (int i=0; i>=0; i--)
+      all.addAll (q[i]);
+    System.out.println (all.toString ());
   }
 }
 
