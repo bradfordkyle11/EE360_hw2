@@ -2,7 +2,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class testPriorityQueue implements Runnable
 {
-  static PriorityQueue q = new PriorityQueue (10);
+  static PriorityQueue q = new PriorityQueue (5);
   static int count = 0;
 
   public testPriorityQueue ()
@@ -12,15 +12,15 @@ public class testPriorityQueue implements Runnable
   public void run ()
   {
     long tid = Thread.currentThread ().getId ();
-    int i = ThreadLocalRandom.current().nextInt(0, 100);
     int duration = ThreadLocalRandom.current().nextInt(0, 300);
     int times = 10;
 
-    if (i < 66)
+    for (int j=0; j<times; j++)
     {
-      for (int j=0; j<times; j++)
+      int i = ThreadLocalRandom.current().nextInt(0, 100);
+      if (i < 66)
       {
-        int which = ThreadLocalRandom.current().nextInt(0, 6);
+        int which = count % names.length; //ThreadLocalRandom.current().nextInt(0, 6);
         int priority = ThreadLocalRandom.current().nextInt(0, 10);
         int myCount = ++count;
         System.out.println (tid + " q.add ("+ names[which] + ", " + priority + ")              " + myCount);
@@ -29,7 +29,7 @@ public class testPriorityQueue implements Runnable
         // q.print ();
 
         int yes = ThreadLocalRandom.current().nextInt(0, 2);
-        if (yes > 0 && result != -1)
+        if (yes > 0 && result != -1 && false)
         {
           try
           {
@@ -42,10 +42,7 @@ public class testPriorityQueue implements Runnable
           // q.print ();
         }
       }
-    }
-    else
-    {
-      for (int j=0; j<times; j++)
+      else
       {
         int which = ThreadLocalRandom.current().nextInt(0, 6);
         int myCount = ++count;
@@ -56,11 +53,11 @@ public class testPriorityQueue implements Runnable
     }
   }
 
-  String names[] = new String[] {"A", "B", "C", "D", "E", "F"};
+  String names[] = new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"};
 
   public static void main (String[] args)
   {
-    final int SIZE = 10;
+    final int SIZE = 1;
     Thread[] t = new Thread[SIZE];
 
     for (int i = 0; i < SIZE; ++i) {

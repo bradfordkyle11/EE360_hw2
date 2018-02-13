@@ -32,7 +32,10 @@ public class PriorityQueue {
     try
     {
       while (length >= maxSize)
+      {
+        System.out.println ("FUUUUUUUUUUUUUUUUUULLLLLLLLLLLLLLLLLLLLLLLLLLL");
         full.await ();
+      }
     }
     catch (Exception e)
     {}
@@ -45,13 +48,16 @@ public class PriorityQueue {
     nameQMutex.lock ();
     if (!nameQ.contains (name))
     {
+      System.out.println ("branch 0");
       nameQ.add (name);
       nameQMutex.unlock ();
 
       if (search (name) == -1)
       {
+        System.out.println ("branch 1a");
         qLock[priority].lock ();
         q[priority].add (name);
+        print ();
         qLock[priority].unlock ();
 
         // System.out.println ("(" + name + ", " + priority + ") before...");
@@ -63,13 +69,17 @@ public class PriorityQueue {
         empty.signal ();
         lengthMutex.unlock ();
       }
-
+      else
+        System.out.println ("branch 1b");
       nameQMutex.lock ();
       nameQ.remove (name);
       nameQMutex.unlock ();
     }
     else
+    {
+      System.out.println ("branch 0b");
       nameQMutex.unlock ();
+    }
 
     return result;
   }
